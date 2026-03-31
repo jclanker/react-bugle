@@ -1,0 +1,5 @@
+export { NotificationsProvider, useNotifications } from './context'
+export { notificationBridge } from './bridge'
+export { default } from './Component'
+export * from './styles'
+export * from './defaultStyle'
