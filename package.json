@@ -1,6 +1,6 @@
 {
   "name": "react-bugle",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React notification component with context-based state management",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
