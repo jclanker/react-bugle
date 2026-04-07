@@ -30,7 +30,7 @@ Four builds are available depending on your needs:
 
 The **themed** builds require `styled-components >=5.1` to be installed in your project. This gives you a single shared instance of styled-components, which is necessary if you want to access your app's theme values in custom styles via `props.theme`.
 
-The default builds bundle styled-components, so no extra install is needed — but `props.theme` access in custom styles will not work.
+The default builds bundle their own isolated styled-components instance, so no extra install is needed — but `props.theme` will always be `{}` in custom styles, regardless of any `ThemeProvider` in your app.
 
 ### Usage
 
@@ -132,6 +132,64 @@ notificationBridge.pop(notificationId)
 | buttons  | string   | (optional) Show button controls. Options: 'yesNo', 'ok'. Prevents auto-dismiss                                                         |
 | payload  | function | (optional) Callback invoked when the Yes or Ok button is clicked                                                                       |
 | blocking | boolean  | (optional) Show a darkened overlay behind the notification                                                                             |
+
+### Using the themed build
+
+The `react-bugle/themed` and `react-bugle/themed-iconless` builds use your project's installed `styled-components` instance, which means style functions can access the active styled-components theme via `props.theme`.
+
+Wrap your app with `ThemeProvider` from styled-components and pass your theme object:
+
+```jsx
+import { ThemeProvider } from 'styled-components'
+import Notifications, { NotificationsProvider } from 'react-bugle/themed-iconless'
+
+const theme = {
+  primary: '#6200ea',
+  background: '#1e1e1e'
+}
+
+const App = () => (
+  <ThemeProvider theme={theme}>
+    <NotificationsProvider>
+      <Notifications styles={{
+        success: {
+          label: (defaults) => ({
+            ...defaults,
+            color: ({ theme }) => theme.primary
+          })
+        }
+      }} />
+      {/* rest of your app */}
+    </NotificationsProvider>
+  </ThemeProvider>
+)
+```
+
+You can also combine live theme values (e.g. from your own context) with `props.theme` access for per-property dynamic values:
+
+```jsx
+import Notifications, { createNotificationStyle } from 'react-bugle/themed-iconless'
+import { useContext } from 'react'
+import { ThemeContext } from './context'
+
+const MyNotifications = () => {
+  const { theme } = useContext(ThemeContext)
+
+  return (
+    <Notifications styles={{
+      success: {
+        // pass live values directly to createNotificationStyle
+        ...createNotificationStyle(theme.mainColor, theme.mainColorFade),
+        // or use props.theme for values resolved by styled-components
+        label: (defaults) => ({
+          ...defaults,
+          color: ({ theme }) => theme.background
+        })
+      }
+    }} />
+  )
+}
+```
 
 ### Complete styling example
 
